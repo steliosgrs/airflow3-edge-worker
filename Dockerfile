@@ -1,6 +1,4 @@
+# https://airflow.apache.org/docs/docker-stack/build.html
 FROM apache/airflow:3.0.1
-
-USER airflow
-
-# Install the Google Cloud Storage package
-RUN pip install --no-cache-dir google-cloud-storage 
+COPY requirements.txt /
+RUN pip install --no-cache-dir "apache-airflow==${AIRFLOW_VERSION}" -r /requirements.txt
