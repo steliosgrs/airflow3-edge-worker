@@ -1,0 +1,54 @@
+---
+x-airflow-common: &airflow-common
+  image: edge_worker
+  # image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:3.0.2}
+  # build: .
+  environment: &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: "LocalExecutor,edge3:airflow.providers.edge.executors.EdgeExecutor"
+    AIRFLOW__OPERATORS__DEFAULT_QUEUE: libra-premises-gpu
+    AIRFLOW__EDGE__API_ENABLED: "true"
+    AIRFLOW__EDGE__API_URL: "http://localhost:8080/edge_worker/v1/rpcapi"
+    AIRFLOW__EDGE__PRIVATE_KEY: "b3kAmMbnMKS31iH8jxMhu6WRYWhVSQ31do0LrAZtBck="
+    AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: ""
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    AIRFLOW_CONFIG: "/opt/airflow/config/airflow.cfg"
+  volumes:
+    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
+    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+  user: "${AIRFLOW_UID:-50001}:0"
+  depends_on: &airflow-common-depends-on
+    postgres:
+      condition: service_healthy
+
+services:
+  airflow-edge-worker:
+    <<: *airflow-common
+    command: airflow edge worker
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+    # yamllint enable rule:line-length
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_MIGRATE: "true"
+      _AIRFLOW_WWW_USER_CREATE: "true"
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      _PIP_ADDITIONAL_REQUIREMENTS: ""
+    user: "0:0"
+
+volumes:
+  postgres-db-volume:
+networks:
+  airflow_network:
+    driver: bridge
