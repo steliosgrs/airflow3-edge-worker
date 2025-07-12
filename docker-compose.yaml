@@ -55,15 +55,17 @@ x-airflow-common: &airflow-common
   environment: &airflow-common-env
     # Minimum requirements for your edge worker based on:
     # https://airflow.apache.org/docs/apache-airflow-providers-edge3/stable/deployment.html
-    AIRFLOW__CORE__EXECUTOR: "LocalExecutor,airflow.providers.edge3.executors.EdgeExecutor"
+    # AIRFLOW__CORE__EXECUTOR: "EdgeExecutor"
+    AIRFLOW__CORE__EXECUTOR: "airflow.providers.edge3.executors.EdgeExecutor"
     # AIRFLOW__CORE__INTERNAL_API_SECRET_KEY: ${AIRFLOW__CORE__INTERNAL_API_SECRET_KEY}
     AIRFLOW__EDGE__API_ENABLED: "true"
     jwtSECRET: v6NXpLFRTeo20bF+X2R6Eg==
+    AIRFLOW__LOGGING__BASE_LOG_FOLDER: "DEBUG"
     AIRFLOW__EDGE__API_URL: "http://localhost:8080/edge_worker/v1/rpcapi"
     # Rest of the env variables to set Edge Worker
     AIRFLOW__API_AUTH__JWT_SECRET: v6NXpLFRTeo20bF+X2R6Eg==
     AIRFLOW__OPERATORS__DEFAULT_QUEUE: libra-premises-gpu
-    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: "http://airflow-apiserver:8080/execution/"
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: "http://airflow-apiserver-1:8080/execution/"
     # General env variables
     AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow

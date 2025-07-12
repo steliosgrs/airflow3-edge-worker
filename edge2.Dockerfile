@@ -4,17 +4,15 @@ FROM python:3.10-slim-bullseye
 RUN pip install --no-cache-dir \
     apache-airflow==3.0.2 \
     apache-airflow-providers-edge3[fab]==1.1.1 \
-    pandas 
-
-# install pandas from pandas.tseries.holiday workday
+    pandas
 
 # Create airflow user and directories
 RUN useradd -ms /bin/bash airflow && \
-    mkdir -p /opt/airflow-edge/dags /opt/airflow-edge/config && \
-    chown -R airflow:airflow /opt/airflow-edge
+    mkdir -p /opt/airflow/dags /opt/airflow/logs /opt/airflow/config && \
+    chown -R airflow:airflow /opt/airflow
 
 # Set environment variables
-ENV AIRFLOW_HOME=/opt/airflow-edge
+ENV AIRFLOW_HOME=/opt/airflow
 ENV AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
 
 # Minimum required environment variables for edge worker

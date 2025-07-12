@@ -73,3 +73,9 @@ https://github.com/apache/airflow/blob/87e34a69638e39c46697cd483249771ede793568/
 https://github.com/apache/airflow/blob/87e34a69638e39c46697cd483249771ede793568/airflow-core/src/airflow/jobs/scheduler_job_runner.py#L2462
 
 https://github.com/apache/airflow/blob/87e34a69638e39c46697cd483249771ede793568/airflow-core/src/airflow/executors/executor_loader.py
+
+docker cp airflow3-edge-worker-airflow-scheduler-1:/home/airflow/.local/lib/python3.10/site-packages/airflow/jobs/scheduler_job_runner.py container_scheduler_job_runner.py
+
+airflow edge worker -q default,libra-premises-gpu
+
+airflow edge worker -D --stdout edge-worker.o.log --stderr edge-worker.e.log -q default,libra-premises-gpu
